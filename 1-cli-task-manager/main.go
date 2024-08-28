@@ -11,9 +11,9 @@ import (
 func main() {
 	app := &cli.App{
 		Commands: []*cli.Command{
-			commands.AddCommand,
-			commands.ListCommand,
-			commands.DoCommand,
+			commands.NewAddCommand(),
+			commands.NewListCommand(),
+			commands.NewDoCommand(),
 		},
 	}
 
