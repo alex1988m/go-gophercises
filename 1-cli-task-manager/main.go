@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"os"
 
@@ -9,6 +10,7 @@ import (
 )
 
 func main() {
+	var err error
 	app := &cli.App{
 		Commands: []*cli.Command{
 			commands.NewAddCommand(),
@@ -16,8 +18,21 @@ func main() {
 			commands.NewDoCommand(),
 		},
 	}
+	fmt.Println("Starting db...")
+	err = commands.InitStore()
+	if err != nil {
+		fmt.Println("failed to init store")
+		log.Fatal(err)
+	}
+	
+	if err = app.Run(os.Args); err != nil {
+		log.Fatal(err)
+	}
 
-	if err := app.Run(os.Args); err != nil {
+	fmt.Println("Closing db...")
+	err = commands.CloseStore()
+	if err != nil {
+		fmt.Println("failed to close store")
 		log.Fatal(err)
 	}
 }
