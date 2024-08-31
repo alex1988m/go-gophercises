@@ -18,21 +18,21 @@ func main() {
 			commands.NewDoCommand(),
 		},
 	}
-	fmt.Println("Starting db...")
 	err = commands.InitStore()
 	if err != nil {
 		fmt.Println("failed to init store")
 		log.Fatal(err)
 	}
-	
-	if err = app.Run(os.Args); err != nil {
-		log.Fatal(err)
-	}
 
-	fmt.Println("Closing db...")
-	err = commands.CloseStore()
-	if err != nil {
-		fmt.Println("failed to close store")
+	defer func() {
+		err = commands.CloseStore()
+		if err != nil {
+			fmt.Println("failed to close store")
+			log.Fatal(err)
+		}
+	}()
+
+	if err = app.Run(os.Args); err != nil {
 		log.Fatal(err)
 	}
 }
