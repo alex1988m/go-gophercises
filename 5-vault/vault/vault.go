@@ -1,4 +1,5 @@
 package vault
+
 import (
 	"github.com/alex1988m/go-gophercises/5-vault/logger"
 	"github.com/sirupsen/logrus"
@@ -7,6 +8,7 @@ import (
 )
 
 var log *logrus.Logger = logger.NewLogger()
+
 type Vault struct {
 	cryptor Cryptor
 	storage Storage
