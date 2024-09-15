@@ -21,6 +21,21 @@ func init() {
 }
 
 func main() {
+	storage, err := vault.NewFileStorage("vault.json")
+	if err != nil {
+		log.WithError(err).Fatal("Failed to create file storage")
+	}
+
+	key := []byte(os.Getenv("CIPHER_KEY"))
+	if len(key) == 0 {
+		log.Fatal("CIPHER_KEY environment variable is not set")
+	}
+
+	v, err := vault.New(key, storage)
+	if err != nil {
+		log.WithError(err).Fatal("Failed to create vault")
+	}
+
 	app := &cli.App{
 		Name:  "vault",
 		Usage: "A simple key-value store with encryption",

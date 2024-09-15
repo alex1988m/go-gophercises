@@ -7,12 +7,12 @@ import (
 	"github.com/pkg/errors"
 )
 
-type fileVault struct {
+type FileStorage struct {
 	filePath string
 	data     map[string][]byte
 }
 
-func newFileVault(filePath string) (*fileVault, error) {
+func NewFileStorage(filePath string) (*FileStorage, error) {
 	fv := &fileVault{
 		filePath: filePath,
 		data:     make(map[string][]byte),
@@ -44,12 +44,12 @@ func (fv *fileVault) save() error {
 	return os.WriteFile(fv.filePath, data, 0600)
 }
 
-func (fv *fileVault) get(key string) ([]byte, bool) {
+func (fs *FileStorage) Get(key string) ([]byte, bool) {
 	value, ok := fv.data[key]
 	return value, ok
 }
 
-func (fv *fileVault) set(key string, value []byte) error {
+func (fs *FileStorage) Set(key string, value []byte) error {
 	fv.data[key] = value
 	return fv.save()
 }

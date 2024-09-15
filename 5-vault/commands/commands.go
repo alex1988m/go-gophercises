@@ -57,7 +57,11 @@ func initVault() (*vault.Vault, error) {
 		return nil, fmt.Errorf("CIPHER_KEY environment variable is not set")
 	}
 
-	v, err := vault.New(key, "vault.json")
+	storage, err := vault.NewFileStorage("vault.json")
+	if err != nil {
+		return nil, fmt.Errorf("Failed to create file storage: %w", err)
+	}
+	v, err := vault.New(key, storage)
 	if err != nil {
 		return nil, fmt.Errorf("Failed to create vault: %w", err)
 	}
