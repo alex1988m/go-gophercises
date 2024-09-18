@@ -4,24 +4,34 @@ import (
 	"github.com/alex1988m/go-gophercises/5-vault/logger"
 	"github.com/sirupsen/logrus"
 
+	"fmt"
+	"os"
+
 	"github.com/pkg/errors"
 )
 
 var log *logrus.Logger = logger.NewLogger()
+
+func NewVault() (*Vault, error) {
+	key := []byte(os.Getenv("CIPHER_KEY"))
+	if len(key) == 0 {
+		return nil, fmt.Errorf("CIPHER_KEY environment variable is not set")
+	}
+
+	storage, err := NewFileStorage("vault.json")
+	if err != nil {
+		return nil, fmt.Errorf("Failed to create file storage: %w", err)
+	}
+
+	cryptor := NewAESCryptor(key)
+	return &Vault{cryptor: cryptor, storage: storage}, nil
+}
 
 type Vault struct {
 	cryptor Cryptor
 	storage Storage
 }
 
-func New(key []byte, storage Storage) (*Vault, error) {
-	if storage == nil {
-		return nil, errors.New("storage cannot be nil")
-	}
-
-	cryptor := NewAESCryptor(key)
-	return &Vault{cryptor: cryptor, storage: storage}, nil
-}
 func (v *Vault) Get(key string) ([]byte, error) {
 	value, ok := v.storage.Get(key)
 	if !ok {
@@ -38,6 +48,7 @@ func (v *Vault) Get(key string) ([]byte, error) {
 	log.WithField("key", key).Info("Successfully decrypted value")
 	return decrypted, nil
 }
+
 func (v *Vault) Set(key string, value []byte) error {
 	encrypted, err := v.cryptor.Encrypt(value)
 	if err != nil {

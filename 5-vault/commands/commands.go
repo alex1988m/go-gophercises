@@ -2,7 +2,6 @@ package commands
 
 import (
 	"fmt"
-	"os"
 
 	"github.com/alex1988m/go-gophercises/5-vault/vault"
 	"github.com/urfave/cli/v2"
@@ -14,8 +13,7 @@ func GetCommand(c *cli.Context) error {
 	}
 
 	key := c.Args().Get(0)
-
-	v, err := initVault()
+	v, err := vault.NewVault()
 	if err != nil {
 		return err
 	}
@@ -37,7 +35,7 @@ func SetCommand(c *cli.Context) error {
 	key := c.Args().Get(0)
 	value := c.Args().Get(1)
 
-	v, err := initVault()
+	v, err := vault.NewVault()
 	if err != nil {
 		return err
 	}
@@ -46,25 +44,6 @@ func SetCommand(c *cli.Context) error {
 	if err != nil {
 		return fmt.Errorf("Failed to set value: %w", err)
 	}
-
 	fmt.Printf("Successfully set value for key '%s'\n", key)
 	return nil
-}
-
-func initVault() (*vault.Vault, error) {
-	key := []byte(os.Getenv("CIPHER_KEY"))
-	if len(key) == 0 {
-		return nil, fmt.Errorf("CIPHER_KEY environment variable is not set")
-	}
-
-	storage, err := vault.NewFileStorage("vault.json")
-	if err != nil {
-		return nil, fmt.Errorf("Failed to create file storage: %w", err)
-	}
-	v, err := vault.New(key, storage)
-	if err != nil {
-		return nil, fmt.Errorf("Failed to create vault: %w", err)
-	}
-
-	return v, nil
 }
