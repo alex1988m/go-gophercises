@@ -2,6 +2,7 @@ package vault
 
 import (
 	"github.com/alex1988m/go-gophercises/5-vault/logger"
+	"github.com/alex1988m/go-gophercises/5-vault/storage"
 	"github.com/sirupsen/logrus"
 
 	"fmt"
@@ -18,7 +19,7 @@ func NewVault() (*Vault, error) {
 		return nil, fmt.Errorf("CIPHER_KEY environment variable is not set")
 	}
 
-	storage, err := NewFileStorage("vault.json")
+	storage, err := storage.NewFileStorage("vault.json")
 	if err != nil {
 		return nil, fmt.Errorf("Failed to create file storage: %w", err)
 	}
@@ -29,7 +30,7 @@ func NewVault() (*Vault, error) {
 
 type Vault struct {
 	cryptor Cryptor
-	storage Storage
+	storage storage.Storage
 }
 
 func (v *Vault) Get(key string) ([]byte, error) {

@@ -1,4 +1,4 @@
-package vault
+package storage
 
 import (
 	"encoding/json"
