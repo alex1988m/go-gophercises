@@ -11,12 +11,17 @@ import (
 )
 
 var log *logrus.Logger
-
 func init() {
 	log = logger.NewLogger()
 
-	if err := godotenv.Load(); err != nil {
-		log.WithError(err).Fatal("Error loading .env file")
+	if os.Getenv("CIPHER_KEY") == "" {
+		if err := godotenv.Load(); err != nil {
+			log.WithError(err).Warn("Error loading .env file")
+		}
+	}
+
+	if os.Getenv("CIPHER_KEY") == "" {
+		log.Fatal("CIPHER_KEY is not set in environment variables or .env file")
 	}
 }
 

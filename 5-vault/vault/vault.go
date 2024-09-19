@@ -1,9 +1,8 @@
 package vault
 
 import (
-	
-	"github.com/alex1988m/go-gophercises/5-vault/cryptor"	
-	
+	"github.com/alex1988m/go-gophercises/5-vault/cryptor"
+
 	"github.com/alex1988m/go-gophercises/5-vault/logger"
 	"github.com/alex1988m/go-gophercises/5-vault/storage"
 	"github.com/sirupsen/logrus"
@@ -11,18 +10,34 @@ import (
 	"fmt"
 	"os"
 
+	"path/filepath"
+
 	"github.com/pkg/errors"
 )
 
 var log *logrus.Logger = logger.NewLogger()
-
 func NewVault() (*Vault, error) {
 	key := []byte(os.Getenv("CIPHER_KEY"))
 	if len(key) == 0 {
 		return nil, fmt.Errorf("CIPHER_KEY environment variable is not set")
 	}
 
-	storage, err := storage.NewFileStorage("vault.json")
+	var vaultPath string
+	localVaultPath := "vault.json"
+
+	// Check if vault.json exists in the current directory
+	if _, err := os.Stat(localVaultPath); err == nil {
+		vaultPath = localVaultPath
+	} else {
+		// If not, use the home directory
+		dir, err := os.UserHomeDir()
+		if err != nil {
+			return nil, fmt.Errorf("Failed to get user home directory: %w", err)
+		}
+		vaultPath = filepath.Join(dir, "vault.json")
+	}
+
+	storage, err := storage.NewFileStorage(vaultPath)
 	if err != nil {
 		return nil, fmt.Errorf("Failed to create file storage: %w", err)
 	}
@@ -33,7 +48,7 @@ func NewVault() (*Vault, error) {
 }
 
 type Vault struct {
-	cryptor Cryptor
+	cryptor cryptor.Cryptor
 	storage storage.Storage
 }
 
